@@ -1,6 +1,12 @@
-<?php require_once('partial/header.php'); ?>
+<?php require_once('./partial/header.php'); ?>
     <div class="container p-4">
-        <form action="" method="post">
+        <?php
+        if (isset($_GET['error'])) {
+            $error_message = urldecode($_GET['error']);
+            echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
+        }
+        ?>
+        <form action="create_model.php" method="post">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Name" name="name">
             </div>
@@ -14,8 +20,8 @@
                 <input type="text" class="form-control" placeholder="Image URL" name="image_url">
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">Create</button>
+                <button type="submit" name="submit" class="btn btn-primary btn-block">Create</button>
             </div>
         </form>
     </div>
-<?php require_once('partial/footer.php'); ?>
+<?php require_once('./partial/footer.php');

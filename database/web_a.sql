@@ -40,8 +40,8 @@ CREATE TABLE `student` (
 --
 
 INSERT INTO `student` (`id`, `name`, `age`, `email`, `profile`) VALUES
-(1, 'lanh', 20, 'lanh@gmail.com', 'https://www.meme-arsenal.com/memes/c80eb847d13718484f200eac949796e9.jpg'),
-(2, 'dyna', 30, 'dyna@gmail.com', 'https://i.pinimg.com/736x/72/39/08/723908b5ae1d3285f1437178a2319aa0.jpg');
+(1, 'Girl', 20, 'girl@gmail.com', 'https://res.cloudinary.com/duas1juqs/image/upload/v1699154918/pnv/D%E1%BB%8BchLeNhietBa_viwxvu.jpg'),
+(2, 'HotGirl', 30, 'hotgirl@gmail.com', 'https://res.cloudinary.com/duas1juqs/image/upload/v1697366599/pnv/Mautoc3_sxii24.jpg');
 
 --
 -- Indexes for dumped tables

@@ -3,120 +3,72 @@
  * Connect to database
  */
 function db() {
-    $host     = 'localhost';
-    $database = 'web_a';
-    $user     = 'root';
-    $password = '';
-        
-    try {
-        $db = new PDO("mysql:host=$host;dbname=$database", $user, $password);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);// throw if have error catch will get it
-        // echo "conected";
-        return $db;
-    } catch(PDOException $e) {
-        echo "Connection failed: " . $e->getMessage();
-    }
-    }
+$host     = 'localhost';
+$database = 'web_a';
+$user     = 'root';
+$password = 'mysql';
+    
+try {
+    $db = new PDO("mysql:host=$host;dbname=$database", $user, $password);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);// throw if have error catch will get it
+    // echo "conected";
+    return $db;
+} catch(PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
+}
+
 
 /**
  * Create new student record
  */
-function createStudent($data) {
-    $name = $data['name'] ?? null;
-    $age = $data['age'] ?? null;
-    $email = $data['email'] ?? null;
-    $image_url = $data['image_url'] ?? null;
-
-    // Check if required data is present
-    if (!$name || !$age || !$email || !$image_url) {
-        // Handle the case where required data is missing
-        return false;
-    }
-
-    // Use parameterized queries to prevent SQL injection
+function createStudent($value) {
+    $name = $value['name'];
+    $age = $value['age'];
+    $email = $value['email'];
+    $image_url = $value['image_url'];
     $stmt = db()->prepare("INSERT INTO `student`(`name`, `age`, `email`, `profile`) VALUES (:name, :age, :email, :profile)");
-
-    // Check if the prepare statement was successful
-    if (!$stmt) {
-        // Handle the case where the prepare statement failed
-        return false;
-    }
-
-    // Bind parameters
-    $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-    $stmt->bindParam(':age', $age, PDO::PARAM_INT);
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->bindParam(':profile', $image_url, PDO::PARAM_STR);
-
-    // Execute the query
-    $result = $stmt->execute();
-
-    // Return the result of the execution
-    return $result;
+    var_dump($stmt);
+    return $stmt->execute(['name' => $name, 'age' => $age, 'email' => $email, 'profile' => $image_url]); // sẽ trả ra true /false;
 }
-
 
 /**
  * Get all data from table student
  */
 function selectAllStudents() {
-    try {
-        $stmt = db()->query("SELECT * FROM `student`");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        // Log or handle the exception according to your needs
-        // For example, you can log the error and return an empty array
-        error_log("Error selecting all students: " . $e->getMessage());
-        return [];
-    }
+    $stmt = db()->query("SELECT * FROM `student`;");
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
 }
-
 
 /**
  * Get only one on record by id 
  */
 function selectOnestudent($id) {
-    try {
-        $stmt = db()->prepare("SELECT * FROM `student` WHERE id = ?");
-        
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed");
-        }
-
+    $stmt = db()->prepare("SELECT * FROM `student` WHERE id = ?");
+    if ($stmt) {
         $stmt->bindParam(1, $id);
-
         $stmt->execute();
-        
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {
-        // Log or handle the exception according to your needs
-        error_log("Error selecting one student: " . $e->getMessage());
-        return null;
-    }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        echo "Prepare statement failed";
+        return false;
+    };
 }
-
 
 /**
  * Delete student by id
  */
 function deleteStudent($id) {
-    try {
-        $stmt = db()->prepare("DELETE FROM `student` WHERE id = ?");
-        
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed");
-        }
-
-        $stmt->bindParam(1, $id);
-
+    $stmt = db()->prepare("DELETE FROM `student` WHERE id = :id");
+    if ($stmt) {
+        $stmt->bindParam(':id', $id);
         return $stmt->execute();
-    } catch (Exception $e) {
-        // Log or handle the exception according to your needs
-        error_log("Error deleting student: " . $e->getMessage());
+    } else {
+        echo "Prepare statement failed";
         return false;
     }
 }
-
 
 
 /**
@@ -124,24 +76,16 @@ function deleteStudent($id) {
  * 
  */
 function updateStudent($value_update, $id) {
-    try {
-        $stmt = db()->prepare("UPDATE `student` SET `name` = :name, `age` = :age, `email` = :email, `profile` = :profile WHERE `id` = :id");
-        
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed");
-        }
-
+    $stmt = db()->prepare("UPDATE `student` SET `name` = :name, `age` = :age, `email` = :email, `profile` = :profile WHERE `id` = :id");
+    if ($stmt) {
         $stmt->bindParam(':name', $value_update['name']);
         $stmt->bindParam(':age', $value_update['age']);
         $stmt->bindParam(':email', $value_update['email']);
         $stmt->bindParam(':profile', $value_update['image_url']);
         $stmt->bindParam(':id', $id);
-
         return $stmt->execute();
-    } catch (Exception $e) {
-        // Log or handle the exception according to your needs
-        error_log("Error updating student: " . $e->getMessage());
-        return false;
+    } else {
+        echo "Prepare statement failed";
+        exit;
     }
 }
-

@@ -1,37 +1,38 @@
 <?php
-include_once 'database/database.php';
+include './database/database.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-// Kiểm tra nếu là phương thức POST và các trường không trống
-if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-    isset($_POST['name'], $_POST['age'], $_POST['email'], $_POST['image_url'])) {
-    
-    // Thực hiện kiểm tra dữ liệu, có thể thêm kiểm tra định dạng email hoặc tuổi
     $name = trim($_POST['name']);
-    $age = intval($_POST['age']);
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $image_url = trim($_POST['image_url']);
 
-    if (empty($name) || empty($age) || $email === false || empty($image_url)) {
-        // Xử lý khi dữ liệu không hợp lệ, có thể chuyển hướng lại form với thông báo lỗi
-        // Ví dụ: header("location: form.php?error=InvalidData");
+    if (empty($name) || $age === false || $email === false || empty($image_url)) {
+        $error_message = "Invalid input. Please fill in all fields with valid data.";
+        header("location: create_html.php?error=" . urlencode($error_message));
         exit;
     }
 
-    // Gọi hàm để chèn dữ liệu vào cơ sở dữ liệu
-    $success = createStudent([
-        'name' => $name,
-        'age' => $age,
-        'email' => $email,
-        'image_url' => $image_url,
-    ]);
+    try {
+        $success = createStudent([
+            'name' => $name,
+            'age' => $age,
+            'email' => $email,
+            'image_url' => $image_url,
+        ]);
 
-    if ($success) {
-        // Chuyển hướng sau khi chèn thành công
-        header("location: index.php");
-        exit;
-    } else {
-        // Xử lý khi chèn vào cơ sở dữ liệu thất bại, có thể chuyển hướng lại form với thông báo lỗi
-        // Ví dụ: header("location: form.php?error=DatabaseError");
+        if ($success) {
+            header("location: index.php");
+            exit;
+        } else {
+            $error_message = "Failed to insert data into the database.";
+            header("location: create_html.php?error=" . urlencode($error_message));
+            exit;
+        }
+    } catch (PDOException $e) {
+        error_log("Database error: " . $e->getMessage());
+        $error_message = "An error occurred while processing your request. Please try again later.";
+        header("location: create_html.php?error=" . urlencode($error_message));
         exit;
     }
 }

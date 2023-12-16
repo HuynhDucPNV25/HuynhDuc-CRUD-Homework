@@ -1,5 +1,5 @@
 <?php
-include_once 'database/database.php';
+include_once './database/database.php';
 
 // Kiểm tra xác định rõ ràng để tránh lỗi Undefined index
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
